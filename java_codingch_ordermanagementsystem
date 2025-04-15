@@ -1,0 +1,345 @@
+SQL schema from the product and user class
+==========================================
+
+CREATE TABLE Product (
+    productId INT PRIMARY KEY,
+    productName VARCHAR(100),
+    description TEXT,
+    price DOUBLE,
+    quantityInStock INT,
+    type VARCHAR(50)
+);
+
+CREATE TABLE Electronics (
+    productId INT PRIMARY KEY,
+    brand VARCHAR(100),
+    warrantyPeriod INT,
+    FOREIGN KEY (productId) REFERENCES Product(productId)
+);
+
+CREATE TABLE Clothing (
+    productId INT PRIMARY KEY,
+    size VARCHAR(10),
+    color VARCHAR(50),
+    FOREIGN KEY (productId) REFERENCES Product(productId)
+);
+
+CREATE TABLE User (
+    userId INT PRIMARY KEY,
+    username VARCHAR(100),
+    password VARCHAR(100),
+    role VARCHAR(50)
+);
+
+
+1. Product Base Class
+=====================
+package entity;
+
+public class Product {
+    private int productId;
+    private String productName;
+    private String description;
+    private double price;
+    private int quantityInStock;
+    private String type; // Electronics/Clothing
+
+    public Product() {}
+
+    public Product(int productId, String productName, String description, double price, int quantityInStock, String type) {
+        this.productId = productId;
+        this.productName = productName;
+        this.description = description;
+        this.price = price;
+        this.quantityInStock = quantityInStock;
+        this.type = type;
+    }
+
+     2.Getters and Setters
+    ======================
+    public int getProductId() { return productId; }
+    public void setProductId(int productId) { this.productId = productId; }
+
+    public String getProductName() { return productName; }
+    public void setProductName(String productName) { this.productName = productName; }
+
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+
+    public double getPrice() { return price; }
+    public void setPrice(double price) { this.price = price; }
+
+    public int getQuantityInStock() { return quantityInStock; }
+    public void setQuantityInStock(int quantityInStock) { this.quantityInStock = quantityInStock; }
+
+    public String getType() { return type; }
+    public void setType(String type) { this.type = type; }
+}
+
+3. Electronics Subclass
+=======================
+package entity;
+
+public class Electronics extends Product {
+    private String brand;
+    private int warrantyPeriod;
+
+    public Electronics() {}
+   public Electronics(int productId, String productName, String description, double price, int quantityInStock, String type, String brand, int warrantyPeriod) {
+        super(productId, productName, description, price, quantityInStock, type);
+        this.brand = brand;
+        this.warrantyPeriod = warrantyPeriod;
+    }
+
+    public String getBrand() { return brand; }
+    public void setBrand(String brand) { this.brand = brand; }
+
+    public int getWarrantyPeriod() { return warrantyPeriod; }
+    public void setWarrantyPeriod(int warrantyPeriod) { this.warrantyPeriod = warrantyPeriod; }
+}
+ 
+4. Clothing Subclass
+====================
+package entity;
+
+public class Clothing extends Product {
+    private String size;
+    private String color;
+
+    public Clothing() {}
+
+    public Clothing(int productId, String productName, String description, double price, int quantityInStock, String type, String size, String color) {
+        super(productId, productName, description, price, quantityInStock, type);
+        this.size = size;
+        this.color = color;
+    }
+
+    public String getSize() { return size; }
+    public void setSize(String size) { this.size = size; }
+
+    public String getColor() { return color; }
+    public void setColor(String color) { this.color = color; }
+}
+
+ 5. User Class
+==============
+package entity;
+
+public class User {
+    private int userId;
+    private String username;
+    private String password;
+    private String role; // Admin or User
+
+    public User() {}
+
+    public User(int userId, String username, String password, String role) {
+        this.userId = userId;
+        this.username = username;
+        this.password = password;
+        this.role = role;
+    }
+
+    public int getUserId() { return userId; }
+    public void setUserId(int userId) { this.userId = userId; }
+
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
+
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
+
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
+}
+
+6. IOrderManagementRepository Interface
+=======================================
+   package dao;
+   import entity.Product;
+   import entity.User;
+   import exception.UserNotFoundException;
+   import exception.OrderNotFoundException;
+   import java.util.List;
+
+    public interface IOrderManagementRepository {
+	  void createOrder(User user, List<Product> products);
+    void cancelOrder(int userId, int orderId) throws UserNotFoundException, OrderNotFoundException;
+    void createProduct(User user, Product product) throws UserNotFoundException;
+    void createUser(User user);
+    List<Product> getAllProducts();
+    List<Product> getOrderByUser(User user);
+}
+
+ 7. OrderProcessor Class (Implementation)
+=========================================
+   package dao;
+	import entity.Product;
+	import entity.User;
+	import java.util.ArrayList;
+	import java.util.List;
+	import exception.UserNotFoundException;
+	import exception.OrderNotFoundException;
+
+	public class OrderProcessor implements IOrderManagementRepository {
+	    @Override
+	    public void createOrder(User user, List<Product> products) {
+	   }
+
+	    @Override
+	    public void cancelOrder(int userId, int orderId) throws UserNotFoundException,
+	    OrderNotFoundException {
+	     }
+
+	    @Override
+	    public void createProduct(User user, Product product) throws UserNotFoundException {
+	    }
+
+	    @Override
+	    public void createUser(User user) {
+	    }
+
+	    @Override
+	    public List<Product> getAllProducts() {
+	        return new ArrayList<>();
+	    }
+
+	    @Override
+	    public List<Product> getOrderByUser(User user) {
+	         return new ArrayList<>();
+	    }
+	}
+
+8. DBUtil Class
+=============
+package util;
+
+import java.sql.*;
+import java.util.Properties;
+import java.io.InputStream;
+
+public class DBPropertyUtil {
+    public static String getConnectionString(String propertyFileName) {
+        try (InputStream input = DBPropertyUtil.class.getClassLoader().getResourceAsStream(propertyFileName)) {
+            Properties prop = new Properties();
+            prop.load(input);
+            return prop.getProperty("db.url");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+}
+
+package util;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+
+public class DBConnUtil {
+    public static Connection getConnection(String propertyFileName) {
+        try {
+            String connStr = DBPropertyUtil.getConnectionString(propertyFileName);
+            return DriverManager.getConnection(connStr);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+}
+
+
+ 9. Main Class with Menu
+======================
+package main;
+
+import java.util.*;
+import entity.*;
+import dao.*;
+import exception.*;
+
+public class MainModule {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        IOrderManagementRepository repo = new OrderProcessor();
+
+        while (true) {
+            System.out.println("\n1. Create User\n2. Create Product\n3. Cancel Order\n4. Get All Products\n5. Get Order by User\n6. Exit");
+            System.out.print("Enter your choice: ");
+            int choice = sc.nextInt();
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter user ID: ");
+                    int uid = sc.nextInt();
+                    sc.nextLine();
+                    System.out.print("Enter username: ");
+                    String uname = sc.nextLine();
+                    System.out.print("Enter password: ");
+                    String pwd = sc.nextLine();
+                    System.out.print("Enter role (Admin/User): ");
+                    String role = sc.nextLine();
+                    repo.createUser(new User(uid, uname, pwd, role));
+                    break;
+                case 2:
+                    System.out.print("Enter admin user ID: ");
+                    int auid = sc.nextInt();
+                    sc.nextLine();
+                    System.out.print("Enter product ID: ");
+                    int pid = sc.nextInt();
+                    sc.nextLine();
+                    System.out.print("Enter product name: ");
+                    String pname = sc.nextLine();
+                    System.out.print("Enter description: ");
+                    String desc = sc.nextLine();
+                    System.out.print("Enter price: ");
+                    double price = sc.nextDouble();
+                    System.out.print("Enter stock: ");
+                    int stock = sc.nextInt();
+                    sc.nextLine();
+                    System.out.print("Enter type: ");
+                    String type = sc.nextLine();
+                    try {
+                        repo.createProduct(new User(auid, "", "", "Admin"), new Product(pid, pname, desc, price, stock, type));
+                    } catch (UnauthorizedAccessException e) {
+                        System.out.println(e.getMessage());
+                    }
+                    break;
+                case 3:
+                    System.out.print("Enter user ID: ");
+                    int userId = sc.nextInt();
+                    System.out.print("Enter order ID: ");
+                    int orderId = sc.nextInt();
+                    try {
+                        repo.cancelOrder(userId, orderId);
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                    }
+                    break;
+                case 4:
+                    List<Product> products = repo.getAllProducts();
+                    products.forEach(p -> System.out.println(p.getProductName()));
+                    break;
+                case 5:
+                    System.out.print("Enter user ID: ");
+                    int uid2 = sc.nextInt();
+                    User user = new User(uid2, "", "", "User");
+                    List<Product> ordered = repo.getOrderByUser(user);
+                    ordered.forEach(p -> System.out.println(p.getProductName()));
+                    break;
+                case 6:
+                    System.out.println("Exiting...");
+                    System.exit(0);
+                    break;
+                default:
+                    System.out.println("Invalid choice!");
+            }
+        }
+    }
+}
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
